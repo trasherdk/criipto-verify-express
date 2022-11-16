@@ -1,0 +1,79 @@
+<html>
+  <head>
+    <script type="text/javascript" src="https://unpkg.com/@criipto/auth-js@3.5.1/dist/criipto-auth.umd.js"></script>
+    <script type="text/javascript">
+      const criiptoAuth = new CriiptoAuth({
+        domain: "samples.criipto.id",
+        clientID: "urn:my:application:identifier:9134",
+        store: sessionStorage
+      });
+
+      function spa(path) {
+        criiptoAuth.popup.authorize({
+            redirectUri: window.location.href,
+            prompt: 'login'
+        }).then(result => {
+          const jwt = result.id_token;
+
+          return fetch(path, {
+            headers: {
+              Authorization: `Bearer ${jwt}`
+            }
+          });
+        })
+        .then(response => {
+          if (response.status >= 400) {
+            return response.text().then(text => {
+              throw new Error(response.status + ': '+text);
+            });
+          }
+          return response;
+        })
+        .then(response => response.json())
+        .then(payload => {
+          console.log(payload);
+          document.getElementById('response').innerText = JSON.stringify(payload, null, 2);
+        }).catch(err => {
+          console.error(err);
+          document.getElementById('response').innerText = JSON.stringify(err, null, 2);
+        });
+
+        return false;
+      }
+    </script>
+  </head>
+  <body>
+    <p>
+      Inspect the network console to follow along (if testing MitID, you need to disable breakpoints in your javascript console).
+    </p>
+    <ul>
+      <li>
+        <a href="/passport/redirect?prompt=login">Login with Passport + Redirect</a>
+      </li>
+      <li>
+        <a href="#" onclick="spa('/passport/jwt')">Login with Passport + JWT (using @criipto/auth-js)</a>
+      </li>
+      <li>
+        <a href="/passport/protected">Access Passport (redirect) protected route</a>
+      </li>
+      <li>
+        <a href="/passport/logout">Logout with Passport</a>
+      </li>
+    </ul>
+    <ul>
+      <li>
+        <a href="#" onclick="spa('/plain/jwt')">Login with plain Express + JWT (using @criipto/auth-js)</a>
+      </li>
+      <li>
+        <a href="/plain/redirect?prompt=login">Login with plain Express + Redirect</a>
+      </li>
+      <li>
+        <a href="/plain/protected">Access plain Express (redirect) protected route</a>
+      </li>
+      <li>
+        <a href="/plain/logout">Logout with plain Express</a>
+      </li>
+    </ul>
+    <pre id="response"></pre>
+  </body>
+</html>
