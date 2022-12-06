@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/criipto/criipto-verify-express#readme",
   "dependencies": {
-    "@criipto/oidc": "^1.2.1",
+    "@criipto/oidc": "^1.2.2",
     "debug": "^4.3.4",
     "jose": "^4.8.3",
     "node-fetch": "^2.6.7",
